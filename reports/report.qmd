@@ -87,11 +87,10 @@ List all non-countries.
 ## Once you figure it out, write a query to list all the non-countries
 ## (skills: select, where)
 
-run_sql_and_return_html(cnx,"""
+run_sql_and_return_html(cnx, """
 select *
-from world_bank_data.wdi_country
-where income_group is null
-   or country_region is null
+from wdi_country
+where `Income Group` is null or `Region` is null;
 """)
 
 ```
@@ -102,19 +101,18 @@ Create your own copy of WDI_Country containing just countries.
 
 ```{python}
 # Create your own table in your own schema
-execute_ddl(cnx,"""
+execute_ddl(cnx, """
 drop table if exists wdi_country;
 create table wdi_country as
 select *
-from world_bank_data.wdi_country
-where country_region is not null;
+from world_bank_data.wdi_country;
 """)
 
 # Count records in your new table
 run_sql_and_return_html(cnx,"""
 select count(*)
-from world_bank_data.wdi_country
-where country_region is not null
+from wdi_country
+where Region is not null;
 """)
 ```
 
@@ -126,9 +124,9 @@ According to the World Bank, in 2020 there were how many countries in the world?
 ## (skills: select, aggregate)
 
 run_sql_and_return_html(cnx,"""
-select count(distinct country_code) as "Countries in 2020"
-from world_bank_data.wdi_data
-where year = 2020
+select count(distinct `Country Code`) as "Countries in 2020"
+from wdi_data
+where Year = 2020;
 """)
 
 ```
@@ -160,6 +158,8 @@ select *
 from world_bank_data.wdi_country
 limit 1;
 """)
+
+
 ## Task 7
 
 How many countries are in each region?
@@ -252,9 +252,9 @@ order by count desc;
 ## you will be scored on the number of records returned and the value(s) 
 ## in the first column.
 
-run_sql_and_return_html(cnx,"""
-select `Short Name`
-from world_bank_data.wdi_country
+run_sql_and_return_html(cnx, """
+select `Short Name`, `Region`, `Income Group`
+from wdi_country
 where `Income Group` is null;
 """)
 
@@ -277,10 +277,10 @@ where region is not null;
 ## Write an update comment to correct the issue.
 ## NOTE - if you get this wrong, all subsequent tables will be wrong!
 
-execute_ddl(cnx,"""
+execute_ddl(cnx, """
 update wdi_country
 set `Income Group` = 'High income'
-where `Short Name` = 'Qatar';
+where `Short Name` in ('Qatar', 'Venezuela');
 """)
 
 
